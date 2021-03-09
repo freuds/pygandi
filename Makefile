@@ -4,7 +4,6 @@ SHELL:=/bin/bash -eu
 default: help
 
 ##########################################################################
-## This command manage helm release with the cluster Kubernetes
 ## Usage: make <command>
 ##
 ## Available Commands:
@@ -12,7 +11,7 @@ default: help
 help:
 		@cat $(MAKEFILE_LIST) | grep ^\#\# | grep -v ^\#\#\# |cut -c 4-
 
-##  - make install : Create env with pip
+##  - make install : Create env with pipenv
 install:
 		pipenv install --dev --skip-lock
 
