@@ -9,5 +9,5 @@ name = "pypi"
 pytest = "*"
 pytest-mock = "*"
 
-[requires]
-python_version = "3.7"
+#[requires]
+#python_version = "3.9"
