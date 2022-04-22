@@ -2,33 +2,27 @@
 pygandi
 ========
 
-CLI for Update DNS on `Gandi <https://gandi.net/>`_
-
-
-Clone repository
-----------------
-
-``git clone https://github.com/freuds/pygandi.git``
-
+CLI for create / Update DNS records on `Gandi.net <https://gandi.net/>`_
 
 Install and Build
 -----------------
 ``$ make help``
+
 Usage: make <command>
 
 Available Commands:
  - make help : Display help for this command (default)
- - make install : Create env with pip
- - make build : Create the wheel package
- - make test : launch pytest on src directory
+ - make pyenv : Create python environment and install needed python modules
+ - make build-wheel : Create the wheel package
+ - make pytest : launch pytest on src directory
 
 Install python environment
 
-``$ make install``
+``$ make pyenv``
 
 Build the package
 
-``$ make build``
+``$ make pywheel``
 
 Install the wheel package
 ``$ sudo pip install dist/pygandi-version-py37-none-any.whl``
@@ -37,13 +31,14 @@ Use sudo command, if you want install package in the normal site-packages folder
 
 Usage
 -----
-usage: pygandi [-h] [--ttl TTL] [--noipv4] [--noipv6] [--dry-run] [--log LOG]
-               key zone record [record ...]
+usage: pygandi [-h] [--ttl TTL] [--noipv4] [--noipv6] [--dry-run] [--log LOG] apikey zone record [record ...]
 
-Keep your gandi DNS records up to date with your current IP (version: 0.1.1)
+    Utility to keep up-to-date your DNS records with your current IP.
+    Works with Gandi.net API services
+    Current version : 0.1.2
 
 positional arguments:
-  key         Gandi API key or path to a file containing the key.
+  apikey      Gandi API key or path to a file containing the key.
   zone        Zone to update
   record      Records to update
 
@@ -53,16 +48,30 @@ optional arguments:
   --noipv4    Do not set 'A' records to current ipv4
   --noipv6    Do not set 'AAAA' records to current ipv6
   --dry-run   do a dry run and don't change anything
-  --log LOG   Available levels are CRITICAL (3), ERROR (2), WARNING (1), INFO
-              (0), DEBUG (-1)
+  --log LOG   Available levels are CRITICAL (3), ERROR (2), WARNING (1), INFO (0), DEBUG (-1)
+
+DEVELOPMENT
+-----------
+
+``$ make install``
+
+Activate virtualenv :
+To activate this project's virtualenv, run pipenv shell.
+Alternatively, run a command inside the virtualenv with pipenv run.
 
 
-CRONJOB
--------
+INSTALL AS CLASSIC CRONJOB
+--------------------------
 
 Add a file in your /etc/cron.d folder
 
 example: gandi-dns-update
 
-5 * * * * root test -x pygandi && pygandi YOUR_API_KEY example.com www subdomain 
+5 * * * * root test -x pygandi && pygandi YOUR_API_KEY example.com www subdomain
+
+
+INSTALL AS KUBERNETES JOB
+-------------------------
+
+@TODO
 

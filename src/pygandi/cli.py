@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+import argparse
 from pygandi import gandi, helpers
 
 import os
@@ -15,11 +16,12 @@ def create_parser():
 
     parser = ArgumentParser(
         description=f"""
-            Keep your gandi DNS records up to date with your current IP
-            (version: {pkg_resources.require("pygandi")[0].version})
-        """
+    Utility to keep up-to-date your DNS records with your current IP.
+    Works with Gandi.net API services
+    Current version : {pkg_resources.require("pygandi")[0].version}""",
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument('key', type=str, help="Gandi API key or path to a file containing the key.")
+    parser.add_argument('apikey', type=str, help="Gandi API key or path to a file containing the key.")
     parser.add_argument('zone', type=str, help="Zone to update")
     parser.add_argument('record', type=str, nargs='+', help="Records to update")
     parser.add_argument('--ttl', type=int, default=300, help="Set a custom ttl (in second)")
@@ -49,11 +51,11 @@ def main():
 
     log.info('Gandi DNS record update started.')
 
-    if os.path.isfile(args.key):
-        with open(args.key) as fle:
-            gandi_api_key = fle.read().strip()    
+    if os.path.isfile(args.apikey):
+        with open(args.apikey) as fle:
+            gandi_api_key = fle.read().strip()
     else:
-        gandi_api_key = args.key
+        gandi_api_key = args.apikey
 
     try:
         helpers.check_apikey_format(gandi_api_key)

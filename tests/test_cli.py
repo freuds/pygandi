@@ -5,7 +5,7 @@ from pygandi import cli, helpers
 @pytest.fixture()
 def parser():
     return cli.create_parser()
-    
+
 def test_parser_fails_without_arguments(parser):
     """
     Without arguments, the parser should exit with an error.

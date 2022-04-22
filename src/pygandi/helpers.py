@@ -2,7 +2,7 @@ import re
 
 def check_apikey_format(apikey):
     """
-    check that the entered key len is 16 characters
+    check that the entered key len is 24 characters
     """
     if len(apikey) != 24:
         raise ValueError("APIKey incorrect")
