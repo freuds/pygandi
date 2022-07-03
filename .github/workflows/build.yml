@@ -1,32 +1,32 @@
-# name: build
-# on:
-#   push:
-#     paths-ignore:
-#       - '**.md'
-#     branches:
-#       - main
+name: build
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+    branches:
+      - main
 
-# jobs:
-#   build:
-#     strategy:
-#       matrix:
-#         python-version: ['3.9']
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v2
-#       - name: Set up Python ${{ matrix.python-version }}
-#         uses: actions/setup-python@v2
-#         with:
-#           python-version: ${{ matrix.python-version }}
-#       - name: Install pygandi
-#         run: |
-#           python3 setup.py bdist_wheel
-#       - name: Install pygandi
-#         run: |
-#           python3 setup.py bdist_wheel
-#       - name: Test
-#         run: |
-#           PYTHONPATH=./src pytest
+jobs:
+  build:
+    strategy:
+      matrix:
+        python-version: ['3.9']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install pygandi
+        run: |
+          python3 setup.py bdist_wheel
+      - name: Install pygandi
+        run: |
+          python3 setup.py bdist_wheel
+      - name: Test
+        run: |
+          PYTHONPATH=./src pytest
 
   # docker:
   #   runs-on: ubuntu-latest
