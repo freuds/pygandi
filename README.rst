@@ -53,12 +53,14 @@ optional arguments:
 DEVELOPMENT
 -----------
 
-``$ make install``
+``$ make pyenv``
 
-Activate virtualenv :
+This command install dependency libraries and activate a virtualenv :
 To activate this project's virtualenv, run pipenv shell.
 Alternatively, run a command inside the virtualenv with pipenv run.
 
+To launch the script, you can use:
+``PYTHONPATH=./src pygandi --help``
 
 INSTALL AS CLASSIC CRONJOB
 --------------------------
@@ -67,8 +69,7 @@ Add a file in your /etc/cron.d folder
 
 example: gandi-dns-update
 
-5 * * * * root test -x pygandi && pygandi YOUR_API_KEY example.com www subdomain
-
+5 * * * * root test -x pygandi && pygandi YOUR_API_KEY example.com www subdomain1 subdomain2
 
 INSTALL AS KUBERNETES JOB
 -------------------------

@@ -51,6 +51,17 @@ pytest:
 		PYTHONPATH=./src pytest
 
 ##  - make image : create docker image
-image: pywheel
-		@docker build -t $(NAME):$(VERSION) -f Dockerfile .
-		docker images
+image:
+		@docker build \
+			-t $(NAME):$(VERSION) -f Dockerfile .
+		@docker images
+
+##  - make image-test : run docker image
+image-test:
+		@docker run --rm \
+		 	--name pygandi-test \
+			$(NAME):$(VERSION) \
+			apikey=012345678901234567890123 \
+			zone=domain.com \
+			record=test1,test2,test3 \
+			--log=DEBUG
