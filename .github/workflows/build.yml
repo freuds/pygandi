@@ -27,7 +27,7 @@ jobs:
       - name: Test pygandi
         run: |
           pipenv install --dev
-          pipenv run --no-interactive PYTHONPATH=./src pytest
+          pipenv run PYTHONPATH=./src pytest
           
 
   # docker:
