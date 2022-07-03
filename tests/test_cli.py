@@ -19,7 +19,7 @@ def test_parser_fails_with_good_len_apikey(parser):
     """
     with pytest.raises(ValueError) as e:
         assert helpers.check_apikey_format("xxxx")
-    assert str(e.value) == "APIKey incorrect"
+    assert str(e.value) == "APIKey format incorrect"
 
 
 def test_parser_fails_without_zone(parser):
@@ -37,6 +37,6 @@ def test_parser_with_all_positional_arguments(parser):
     """
     args = parser.parse_args(['xxxx', 'example.com', '@', 'www', 'subdomain'])
 
-    assert args.key == 'xxxx'
+    assert args.apikey == 'xxxx'
     assert args.zone == 'example.com'
     assert args.record == ['@', 'www', 'subdomain']
