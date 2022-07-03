@@ -23,7 +23,7 @@ def create_parser():
     )
     parser.add_argument('apikey', type=str, help="Gandi API key or path to a file containing the key.")
     parser.add_argument('zone', type=str, help="Zone to update")
-    parser.add_argument('record', type=str, nargs='+', help="Records to update")
+    parser.add_argument('record', type=str, nargs='+', help="Records to update (can be write with a separator")
     parser.add_argument('--ttl', type=int, default=300, help="Set a custom ttl (in second)")
     parser.add_argument('--noipv4', action='store_true', help="Do not set 'A' records to current ipv4")
     parser.add_argument('--noipv6', action='store_false', help="Do not set 'AAAA' records to current ipv6")
@@ -71,6 +71,7 @@ def main():
 
     log.debug(f'API Key found: {gandi_api_key}')
     log.debug(f'Domaine Name found: {args.zone}')
+    log.debug(f'Records found: {args.record}')
 
     api = gandi.GandiAPI(GANDI_API_URL, gandi_api_key, args.dry_run)
 

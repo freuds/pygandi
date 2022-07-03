@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from posixpath import split
 import sys
 import urllib.request
 
@@ -14,8 +15,14 @@ class GandiAPI:
 
     def update_records(self, fqdn, record_names, current_ip, ttl=3600,
                        rtype="A"):
+        records=[]
+        if any("," in s for s in record_names):
+            records=record_names[0].split(',')
+        else:
+            records=record_names
 
-        for name in record_names:
+        log.info("There are a total of %s record(s) to test", len(records))
+        for name in records:
             record = self.get_domain_record_by_name(fqdn, name, rtype=rtype)
 
             if record is not None and current_ip in record['rrset_values']:
@@ -40,6 +47,11 @@ class GandiAPI:
                     log.debug(json.loads(response.read().decode()))
                 log.info(
                     "Record %s for %s.%s is set to %s.",
+                    rtype, name, fqdn, current_ip
+                )
+            else:
+                log.info(
+                    "Dry-run mode: Record %s for %s.%s is set to %s.",
                     rtype, name, fqdn, current_ip
                 )
 
