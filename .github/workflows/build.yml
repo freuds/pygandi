@@ -18,9 +18,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install pygandi
+      - name: Install modules
         run: |
-          python3 setup.py bdist_wheel
+          python3 -m pip install pipenv wheel pytest rstcheck
       - name: Install pygandi
         run: |
           python3 setup.py bdist_wheel
