@@ -1,9 +1,0 @@
-name: docker
-on:
-  push:
-    paths-ignore:
-      - '**.md'
-    branches:
-      - main
-
-jobs:
