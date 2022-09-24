@@ -65,3 +65,9 @@ image-test:
 			zone=domain.com \
 			record=test1,test2,test3 \
 			--log=DEBUG
+
+##  - make image-push
+image-push:
+		@docker login
+		@docker tag $(NAME):$(VERSION) $(REGISTRY)/$(REGISTRY_USER)/$(NAME):$(VERSION)
+		@docker push $(REGISTRY_USER)/$(NAME):$(VERSION)
