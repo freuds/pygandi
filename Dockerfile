@@ -11,14 +11,14 @@ RUN pipenv install --dev \
 # build on python alpine
 FROM python:3.9-alpine
 
-ARG version
-ENV version=${version}
+ARG VERSION
+ENV VERSION=${VERSION}
 
-COPY --from=build /app/dist/pygandi-$version-py39-none-any.whl .
+COPY --from=build /app/dist/pygandi-${VERSION}-py39-none-any.whl .
 
 RUN python3 -m pip install \
     --no-cache-dir \
     --no-cache \
-    /pygandi-$version-py39-none-any.whl
+    /pygandi-${VERSION}-py39-none-any.whl
 
 ENTRYPOINT [ "python3", "./usr/local/bin/pygandi" ]

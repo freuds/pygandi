@@ -53,8 +53,9 @@ pytest:
 ##  - make image : create docker image
 image:
 		@docker build \
-			-e version=$(VERSION) \
-			-t $(NAME):$(VERSION) -f Dockerfile .
+			--build-arg VERSION=$(VERSION) \
+			-t $(NAME):$(VERSION) \
+			-f Dockerfile .
 		@docker images
 
 ##  - make image-test : run docker image
