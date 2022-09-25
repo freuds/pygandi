@@ -33,10 +33,9 @@ def test_parser_fails_without_zone(parser):
 # @pytest.mark.skip(reason="just testing if skip works")
 def test_parser_with_all_positional_arguments(parser):
     """
-    With APIKey, domaine and records, the parser will not exit.
+    With domaine and records, the parser will not exit.
     """
-    args = parser.parse_args(['xxxx', 'example.com', '@', 'www', 'subdomain'])
+    args = parser.parse_args(['example.com', '@', 'www', 'subdomain'])
 
-    assert args.apikey == 'xxxx'
     assert args.zone == 'example.com'
     assert args.record == ['@', 'www', 'subdomain']
