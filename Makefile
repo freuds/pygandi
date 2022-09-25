@@ -16,9 +16,9 @@ REGISTRY_USER ?= freuds2k
 # This version-strategy uses git tags to set the version string
 # Get the following from left to right: tag > branch > branch of detached HEAD commit
 #VERSION = $(shell git describe --tags --exact-match 2>/dev/null || git symbolic-ref -q --short HEAD 2>/dev/null || git name-rev --name-only "$$( git rev-parse --short HEAD )" | sed 's@remotes/origin/@@' | sed 's@~.*@@' )
-VERSION = $(shell cat VERSION)
+VERSION ?= $(shell cat VERSION)
 # Get the short SHA
-SHA_SHORT = $(shell git rev-parse --short HEAD)
+SHA_SHORT ?= $(shell git rev-parse --short HEAD)
 NAME = pygandi
 ##########################################################################
 ## Usage: make <command>
@@ -53,6 +53,7 @@ pytest:
 ##  - make image : create docker image
 image:
 		@docker build \
+			-e version=$(VERSION) \
 			-t $(NAME):$(VERSION) -f Dockerfile .
 		@docker images
 

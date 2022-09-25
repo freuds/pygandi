@@ -11,7 +11,8 @@ RUN pipenv install --dev \
 # build on python alpine
 FROM python:3.9-alpine
 
-ARG version=0.1.3
+ARG version
+ENV version=${version}
 
 COPY --from=build /app/dist/pygandi-$version-py39-none-any.whl .
 
