@@ -47,9 +47,8 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        # build-args: |
-        #   NGINX_PORT=5000
-        #   HUGO_ENV=production
+        build-args: |
+          VERSION=${{needs.version.outputs.version}}
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{needs.version.outputs.version}}
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
