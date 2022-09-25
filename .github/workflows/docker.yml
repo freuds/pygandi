@@ -55,7 +55,3 @@ jobs:
 
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
-
-    - name: Inspect
-      run: |
-        docker image inspect ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{needs.version.outputs.version}}
