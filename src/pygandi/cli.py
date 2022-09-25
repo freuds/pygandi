@@ -6,6 +6,7 @@ import os
 import sys
 import pkg_resources
 import logging
+import math
 
 IPV4_PROVIDER_URL = "https://api.ipify.org"
 IPV6_PROVIDER_URL = "https://api6.ipify.org"
@@ -18,10 +19,10 @@ def create_parser():
         description=f"""
     Utility to keep up-to-date your DNS records with your current IP.
     Works with Gandi.net API services
+    To authenticate with Gandi API, just set environment variable for API_KEY
     Current version : {pkg_resources.require("pygandi")[0].version}""",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument('apikey', type=str, help="Gandi API key or path to a file containing the key.")
     parser.add_argument('zone', type=str, help="Zone to update")
     parser.add_argument('record', type=str, nargs='+', help="Records to update (can be write with a separator")
     parser.add_argument('--ttl', type=int, default=300, help="Set a custom ttl (in second)")
@@ -30,6 +31,10 @@ def create_parser():
     parser.add_argument('--dry-run', action='store_true', help="do a dry run and don't change anything")
     parser.add_argument('--log', type=str, default='INFO', help='Available levels are CRITICAL (3), ERROR (2), WARNING (1), INFO (0), DEBUG (-1)')
     return parser
+
+def mask_string(s, perc=0.8):
+    mask_chars = math.ceil(len(s) * perc)
+    return f'{"*" * mask_chars}{s[mask_chars:]}'
 
 def main():
 
@@ -51,11 +56,13 @@ def main():
 
     log.info('Gandi DNS record update started.')
 
-    if os.path.isfile(args.apikey):
-        with open(args.apikey) as fle:
-            gandi_api_key = fle.read().strip()
+    if "API_KEY" in os.environ:
+        gandi_api_key = os.environ.get('API_KEY')
+        mask_string(gandi_api_key)
+        log.debug(f'Found variable environment API_KEY : {mask_string(gandi_api_key)}')
     else:
-        gandi_api_key = args.apikey
+        log.error("Missing API_KEY")
+        sys.exit(1)
 
     try:
         helpers.check_apikey_format(gandi_api_key)
@@ -65,12 +72,11 @@ def main():
 
     try:
         helpers.check_domain_format(args.zone)
+        log.debug(f'Domaine Name found: {args.zone}')
     except Exception as e:
         log.error(e)
         sys.exit(1)
 
-    log.debug(f'API Key found: {gandi_api_key}')
-    log.debug(f'Domaine Name found: {args.zone}')
     log.debug(f'Records found: {args.record}')
 
     api = gandi.GandiAPI(GANDI_API_URL, gandi_api_key, args.dry_run)
