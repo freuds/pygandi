@@ -13,8 +13,11 @@ Usage: make <command>
 Available Commands:
  - make help : Display help for this command (default)
  - make pyenv : Create python environment and install needed python modules
- - make build-wheel : Create the wheel package
+ - make pywheel : Create the python wheel package
  - make pytest : launch pytest on src directory
+ - make image : create local docker image
+ - make image-test : run docker image
+ - make image-push : push local image on docker hub
 
 Install python environment
 
@@ -35,10 +38,9 @@ usage: pygandi [-h] [--ttl TTL] [--noipv4] [--noipv6] [--dry-run] [--log LOG] ap
 
     Utility to keep up-to-date your DNS records with your current IP.
     Works with Gandi.net API services
-    Current version : 0.1.2
+    Current version : 0.1.4
 
 positional arguments:
-  apikey      Gandi API key or path to a file containing the key.
   zone        Zone to update
   record      Records to update
 
@@ -60,7 +62,7 @@ To activate this project's virtualenv, run pipenv shell.
 Alternatively, run a command inside the virtualenv with pipenv run.
 
 To launch the script, you can use:
-``PYTHONPATH=./src pygandi --help``
+``PYTHONPATH=./src API_KEY=xxxxx pygandi --help``
 
 INSTALL AS CLASSIC CRONJOB
 --------------------------
@@ -69,10 +71,9 @@ Add a file in your /etc/cron.d folder
 
 example: gandi-dns-update
 
-5 * * * * root test -x pygandi && pygandi YOUR_API_KEY example.com www subdomain1 subdomain2
+``5 * * * * root test -x pygandi && API_KEY=xxxxxxxxxx ; pygandi example.com www subdomain1 subdomain2``
 
-INSTALL AS KUBERNETES JOB
+DOCKER IMAGE
 -------------------------
 
-@TODO
-
+You can use a docker image for launch in kubernetes as cronjob : `DockerHub <https://hub.docker.com/repository/docker/freuds2k/pygandi>`_

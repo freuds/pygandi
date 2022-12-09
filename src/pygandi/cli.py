@@ -19,7 +19,10 @@ def create_parser():
         description=f"""
     Utility to keep up-to-date your DNS records with your current IP.
     Works with Gandi.net API services
-    To authenticate with Gandi API, just set environment variable for API_KEY
+
+    To authenticate with Gandi API, pass your token as environment variable :
+    => API_KEY=xxxxxxxxxx
+
     Current version : {pkg_resources.require("pygandi")[0].version}""",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -61,7 +64,7 @@ def main():
         mask_string(gandi_api_key)
         log.debug(f'Found variable environment API_KEY : {mask_string(gandi_api_key)}')
     else:
-        log.error("Missing API_KEY")
+        log.error("Missing env for API_KEY")
         sys.exit(1)
 
     try:
@@ -85,7 +88,7 @@ def main():
         current_ipv4 = gandi.get_current_ip(IPV4_PROVIDER_URL)
         api.update_records(args.zone, args.record, current_ipv4, ttl=args.ttl)
     if not args.noipv6:
-        current_ipv6 = helpers.get_current_ip(IPV6_PROVIDER_URL)
+        current_ipv6 = gandi.get_current_ip(IPV6_PROVIDER_URL)
         api.update_records(
             args.zone, args.record, current_ipv6, ttl=args.ttl, rtype="AAAA"
         )
