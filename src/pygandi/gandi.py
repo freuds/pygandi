@@ -21,13 +21,14 @@ class GandiAPI:
         else:
             records=record_names
 
-        log.info("There are a total of %s record(s) to test", len(records))
+        log.info("There are a total of %s record(s) to check", len(records))
+
         for name in records:
             record = self.get_domain_record_by_name(fqdn, name, rtype=rtype)
 
             if record is not None and current_ip in record['rrset_values']:
                 log.info(
-                    "Record %s for %s.%s is up to date (%s).",
+                    "(%s) Record: %s.%s is already up to date (%s).",
                     rtype, name, fqdn, current_ip
                 )
             elif not self.dry_run:
@@ -51,7 +52,7 @@ class GandiAPI:
                 )
             else:
                 log.info(
-                    "Dry-run mode: Record %s for %s.%s is set to %s.",
+                    "Dry-run mode: Record %s for %s.%s will set to %s.",
                     rtype, name, fqdn, current_ip
                 )
 

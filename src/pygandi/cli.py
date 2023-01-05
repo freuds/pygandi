@@ -61,7 +61,6 @@ def main():
 
     if "API_KEY" in os.environ:
         gandi_api_key = os.environ.get('API_KEY')
-        mask_string(gandi_api_key)
         log.debug(f'Found variable environment API_KEY : {mask_string(gandi_api_key)}')
     else:
         log.error("Missing env for API_KEY")
@@ -75,7 +74,7 @@ def main():
 
     try:
         helpers.check_domain_format(args.zone)
-        log.debug(f'Domaine Name found: {args.zone}')
+        log.debug(f'Domain Name found: {args.zone}')
     except Exception as e:
         log.error(e)
         sys.exit(1)

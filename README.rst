@@ -28,7 +28,7 @@ Build the package
 ``$ make pywheel``
 
 Install the wheel package
-``$ sudo pip install dist/pygandi-version-py37-none-any.whl``
+``$ sudo pip install dist/pygandi-version-py39-none-any.whl``
 
 Use sudo command, if you want install package in the normal site-packages folder
 
