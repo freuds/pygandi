@@ -1,6 +1,8 @@
 # Standard library imports
 import json
 import logging
+import os
+import ssl
 import sys
 import urllib.request
 from dataclasses import dataclass
@@ -174,7 +176,21 @@ def get_current_ip(provider_url: str) -> str:
         SystemExit: If there is an error fetching the IP address
     """
     try:
-        with urllib.request.urlopen(provider_url) as response:
+        # Configure SSL context with system certificates
+        ssl_context = ssl.create_default_context()
+
+        # Use environment variables for SSL certificates if provided
+        cert_file = os.environ.get("SSL_CERT_FILE")
+        cert_dir = os.environ.get("SSL_CERT_DIR")
+
+        if cert_file:
+            ssl_context.load_verify_locations(cafile=cert_file)
+        if cert_dir:
+            ssl_context.load_verify_locations(capath=cert_dir)
+
+        # Create request with SSL context
+        request = urllib.request.Request(provider_url)
+        with urllib.request.urlopen(request, context=ssl_context) as response:
             ip = response.read().decode("utf-8").strip()
             if not isinstance(ip, str):
                 raise ValueError("IP address must be a string")
@@ -185,4 +201,7 @@ def get_current_ip(provider_url: str) -> str:
         sys.exit(1)
     except urllib.error.URLError as url_error:
         log.error("URL error occurred: %s", url_error)
+        sys.exit(1)
+    except ssl.SSLError as ssl_error:
+        log.error("SSL error occurred: %s", ssl_error)
         sys.exit(1)

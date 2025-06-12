@@ -17,7 +17,7 @@ def check_apitoken_format(token: str) -> str:
     """
     if not re.match(r"^[a-zA-Z0-9]{40}$", token):
         raise ValueError("API_TOKEN format incorrect")
-    return "APIKey format correct"
+    return "API_TOKEN format correct"
 
 
 def check_domain_format(domain: str) -> str:
