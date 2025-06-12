@@ -1,73 +1,80 @@
-SHELL:=/bin/bash -eu
+SHELL := /bin/bash -eu
+.PHONY: default help clean venv build test image image-test image-push
 
-.PHONY: default install build test
-default: help
-
-# python modules
-PYTHON_MODULES = pipenv wheel pytest rstcheck
-
-# The binary to build (just the base).
-BIN := $(shell basename $$PWD)
-
-# Where to push the docker image.
+# Variables
 REGISTRY ?= docker.io
 REGISTRY_USER ?= freuds2k
 
-# This version-strategy uses git tags to set the version string
-VERSION ?= $(shell cat VERSION)
-# Get the short SHA
+VERSION_FILE := version.py
+VERSION ?= $(shell grep '__version__' $(VERSION_FILE) | awk -F '"' '{print $$2}')
 SHA_SHORT ?= $(shell git rev-parse --short HEAD)
 APP_NAME = pygandi
+
 ##########################################################################
 ## Usage: make <command>
 ##
 ## Available Commands:
+
+default: help
+
 ##  - make help : Display help for this command (default)
 help:
-		@cat $(MAKEFILE_LIST) | grep ^\#\# | grep -v ^\#\#\# |cut -c 4-
+	@cat $(MAKEFILE_LIST) | grep ^\#\# | grep -v ^\#\#\# |cut -c 4-
 
-pymods:
-		@pip install --user ${PYTHON_MODULES}
+##  - make install-uv : Install uv package manager if not already installed
+install-uv:
+	@if ! command -v uv >/dev/null 2>&1; then \
+		echo "Installing uv package manager..."; \
+		curl -LsSf https://astral.sh/uv/install.sh | sh; \
+	else \
+		echo "uv is already installed: $$(uv --version)"; \
+	fi
 
+##  - make clean : Clean build artifacts and virtual environment
 clean:
-		@rm -rf .pytest_cache
-		@rm -rf build
-		@rm -rf dist
+	@rm -rf .pytest_cache .mypy_cache build dist *.egg-info
+	@find . -type d -name __pycache__ -exec rm -rf {} +
+	@rm -rf .venv
 
-##  - make pyenv : Create python environment and install needed python modules
-pyenv: pymods
-		@pipenv install --dev --skip-lock
-		@pipenv shell
+##  - make venv : Create virtual environment
+venv:
+	@python3 -m venv .venv
+	@source .venv/bin/activate
 
-##  - make pywheel : Create the python wheel package
-pywheel: clean
-		@python3 setup.py bdist_wheel
+##  - make build : Build the python package
+build: clean venv
+	@source .venv/bin/activate && uv pip install build && python3 -m build
 
-##  - make pytest : launch pytest on src directory
-pytest:
-		# pipenv install --dev --user pytest pytest-mock
-		PYTHONPATH=./src pytest
+##  - make check : Run linting tools & tests
+tests: venv
+	@source .venv/bin/activate && uv pip install -e ".[test]" && \
+		black src/pygandi tests && \
+		isort src/pygandi tests && \
+		pylint src/pygandi tests && \
+		mypy src/pygandi && \
+		pytest -v
 
-##  - make image : create local docker image
+##  - make image : Create local docker image
 image:
-		@docker build \
-			--build-arg VERSION=$(VERSION) \
-			-t $(APP_NAME):$(VERSION) \
-			-f Dockerfile .
-		@docker images
+	@docker build \
+		--build-arg VERSION=$(VERSION) \
+		-t $(APP_NAME):$(VERSION) \
+		-f Dockerfile .
+	@docker images
 
-##  - make image-test : run docker image
+##  - make image-test : Run docker image test
 image-test:
-		@docker run --rm \
-		 	--APP_NAME pygandi-test \
-			$(APP_NAME):$(VERSION) \
-			apikey=012345678901234567890123 \
-			zone=domain.com \
-			record=test1,test2,test3 \
-			--log=DEBUG
+	@docker run --rm \
+		--name pygandi-test \
+		$(APP_NAME):$(VERSION) \
+		apikey=012345678901234567890123 \
+		curl -H "Authorization: Bearer d24da6ddb55a78486ffd7980d3a74d77118f4b90" https://id.gandi.net/tokeninfo \
+		zone=domain.com \
+		record=test1,test2,test3 \
+		--log=DEBUG
 
-##  - make image-push : push local image on docker hub
+##  - make image-push : Push local image to docker hub
 image-push:
-		@docker login
-		@docker tag $(APP_NAME):$(VERSION) $(REGISTRY)/$(REGISTRY_USER)/$(APP_NAME):$(VERSION)
-		@docker push $(REGISTRY_USER)/$(APP_NAME):$(VERSION)
+	@docker login
+	@docker tag $(APP_NAME):$(VERSION) $(REGISTRY)/$(REGISTRY_USER)/$(APP_NAME):$(VERSION)
+	@docker push $(REGISTRY)/$(REGISTRY_USER)/$(APP_NAME):$(VERSION)

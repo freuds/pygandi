@@ -1,6 +1,8 @@
+# pylint: disable=redefined-outer-name
 import pytest
 
 from pygandi import cli, helpers
+
 
 @pytest.fixture()
 def parser():
@@ -13,20 +15,20 @@ def test_parser_fails_without_arguments(parser):
     with pytest.raises(SystemExit):
         parser.parse_args([])
 
-def test_parser_fails_with_good_len_apikey(parser):
+def test_parser_fails_with_good_len_apitoken():
     """
-    Without the good len of APIKey argument, the parser should exit with an error.
+    Without the good len of API_TOKEN argument, the parser should exit with an error.
     """
     with pytest.raises(ValueError) as e:
-        assert helpers.check_apikey_format("xxxx")
-    assert str(e.value) == "APIKey format incorrect"
+        assert helpers.check_apitoken_format("xxxx")
+    assert str(e.value) == "API_TOKEN format incorrect"
 
 
-def test_parser_fails_without_zone(parser):
+def test_parser_fails_without_zone():
     """
     Without zone argument, the parser should exit with an error.
     """
-    with pytest.raises(Exception, match="Invalid domain format"):
+    with pytest.raises(ValueError, match="Invalid domain format"):
         assert helpers.check_domain_format("examplecom")
 
 
