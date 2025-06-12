@@ -23,6 +23,15 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Final stage using latest Python Alpine
 FROM debian:bookworm-slim
 
+# Install CA certificates
+RUN apt-get update && \
+    apt-get install -y ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set SSL certificate environment variables
+ENV SSL_CERT_DIR=/etc/ssl/certs
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+
 # Copy the Python version
 COPY --from=builder --chown=python:python /python /python
 

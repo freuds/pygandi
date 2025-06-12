@@ -65,6 +65,8 @@ image:
 ##  - make image-test : Run docker image test
 image-test:
 	docker run --rm -it \
+		--volume .:/app \
+		--volume /app/.venv \
 		--name pygandi-test \
 		-e API_TOKEN="0123456789012345678901234567890123456789" \
 		$(APP_NAME):$(VERSION) \
