@@ -60,6 +60,10 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    - name: test version
+      run: |
+        echo "Version: ${{ steps.get-version.outputs.version }}"
+
     - name: Build and push
       id: docker-build
       uses: docker/build-push-action@v3

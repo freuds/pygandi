@@ -64,14 +64,15 @@ image:
 
 ##  - make image-test : Run docker image test
 image-test:
-	@docker run --rm \
+	docker run --rm -it \
 		--name pygandi-test \
+		-e API_TOKEN="0123456789012345678901234567890123456789" \
 		$(APP_NAME):$(VERSION) \
-		apikey=012345678901234567890123 \
-		curl -H "Authorization: Bearer d24da6ddb55a78486ffd7980d3a74d77118f4b90" https://id.gandi.net/tokeninfo \
+		pygandi \
 		zone=domain.com \
 		record=test1,test2,test3 \
 		--log=DEBUG
+		--dry-run
 
 ##  - make image-push : Push local image to docker hub
 image-push:
