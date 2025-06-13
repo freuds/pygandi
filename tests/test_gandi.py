@@ -29,15 +29,21 @@ def test_dns_record_creation():
 
 def test_gandi_api_create_record_request():
     """Test GandiAPI._create_record_request method."""
-    api = GandiAPI(url="https://api.gandi.net", key="test_key", dry_run=False)
+    apiGandi = "https://api.gandi.net"
+    api = GandiAPI(url=apiGandi, key="test_key", dry_run=False)
     record = DNSRecord(fqdn="example.com", name="www", ip="192.0.2.1")
 
     # Test POST request (new record)
     request = api._create_record_request(record, is_new=True)
     assert request.method == "POST"
-    assert request.get_full_url().startswith("https://api.gandi.net/domains/")
+    assert request.get_full_url().startswith(f"{apiGandi}/livedns/domains/example.com/records")
     assert request.get_header("Authorization") == "Bearer test_key"
-    assert json.loads(request.data.decode()) == {"rrset_ttl": 3600, "rrset_values": ["192.0.2.1"]}
+    assert json.loads(request.data.decode()) == {
+        "rrset_name": "www",
+        "rrset_ttl": 3600,
+        "rrset_type": "A",
+        "rrset_values": ["192.0.2.1"]
+    }
 
     # Test PUT request (update record)
     request = api._create_record_request(record, is_new=False)
