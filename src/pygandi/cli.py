@@ -12,7 +12,7 @@ from pygandi.gandi import DNSUpdateRequest
 
 IPV4_PROVIDER_URL = "https://api.ipify.org"
 IPV6_PROVIDER_URL = "https://api6.ipify.org"
-GANDI_API_URL = "https://dns.api.gandi.net/api/v5"
+GANDI_API_URL = "https://api.gandi.net/v5"
 LOG_FORMAT = "[%(asctime)s][%(name)s][%(levelname)s] %(message)s"
 
 
@@ -56,12 +56,12 @@ def create_parser() -> ArgumentParser:
     return parser
 
 
-def mask_string(s: str, perc: float = 0.8) -> str:
+def mask_string(s: str, perc: float = 0.9) -> str:
     """Mask a portion of a string with asterisks.
 
     Args:
         s: String to mask
-        perc: Percentage of string to mask (default: 0.8)
+        perc: Percentage of string to mask (default: 0.9)
 
     Returns:
         str: Masked string
@@ -131,6 +131,7 @@ def main() -> None:
             rtype="AAAA",
         )
         api.update_records(update_request)
+
     log.info("Gandi DNS record update ended.")
 
 

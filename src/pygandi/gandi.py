@@ -54,21 +54,29 @@ class GandiAPI:
         self, record: DNSRecord, is_new: bool = True
     ) -> urllib.request.Request:
         """Create a request object for updating a DNS record."""
+
+        log.info("Create New DNS Record: %s.%s", record.name, record.fqdn)
+
         config = RequestConfig(
             method="POST" if is_new else "PUT",
-            headers={"Authorization": f"Bearer {self.key}"},
+            headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.key}"},
         )
 
         if record.ip:
             config.data = json.dumps(
                 {
+                    "rrset_name": record.name,
+                    "rrset_type": record.rtype,
                     "rrset_ttl": record.ttl,
                     "rrset_values": [record.ip],
                 }
             ).encode()
 
+        log.debug("API Request Method: %s", config.method)
+        log.debug("API Request Payload: %s", config.data)
+
         return urllib.request.Request(
-            f"{self.url}/domains/{record.fqdn}/records/{record.name}/{record.rtype}",
+            f"{self.url}/livedns/domains/{record.fqdn}/records",
             method=config.method,
             headers=config.headers,
             data=config.data,
@@ -87,9 +95,11 @@ class GandiAPI:
             update_request: The DNS update request containing all required parameters
         """
         records = self._parse_record_names(update_request.record_names)
-        log.info("There are a total of %s record(s) to check", len(records))
+        log.info("Total of %s record(s) to check", len(records))
 
         for name in records:
+            log.info("Testing Record: %s.%s", name, update_request.fqdn)
+
             existing_record = self.get_domain_record_by_name(
                 update_request.fqdn, name, rtype=update_request.rtype
             )
@@ -128,13 +138,13 @@ class GandiAPI:
 
             with urllib.request.urlopen(request) as response:
                 log.debug(json.loads(response.read().decode()))
-            log.info(
-                "Record %s for %s.%s is set to %s.",
-                update_request.rtype,
-                name,
-                update_request.fqdn,
-                update_request.current_ip,
-            )
+                log.info(
+                    "Record %s for %s.%s is set to %s.",
+                    update_request.rtype,
+                    name,
+                    update_request.fqdn,
+                    update_request.current_ip,
+                )
 
     def get_domain_record_by_name(self, fqdn: str, name: str, rtype: str = "A") -> Optional[dict]:
         """Get a domain record by name.
@@ -150,12 +160,15 @@ class GandiAPI:
         try:
             record = DNSRecord(fqdn=fqdn, name=name, rtype=rtype)
             request = urllib.request.Request(
-                f"{self.url}/domains/{record.fqdn}/records/{record.name}/{record.rtype}",
+                f"{self.url}/livedns/domains/{record.fqdn}/records/{record.name}/{record.rtype}",
                 method="GET",
-                headers={"Authorization": f"Bearer {self.key}"},
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.key}"},
             )
+            log.debug("API Request: %s", request.get_full_url())
+
             with urllib.request.urlopen(request) as response:
                 data = json.loads(response.read().decode())
+                log.debug("API Response: %s", data)
                 if isinstance(data, dict):
                     return data
                 return None
