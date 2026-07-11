@@ -1,5 +1,5 @@
 SHELL := /bin/bash -eu
-.PHONY: default help clean venv build test image image-test image-push
+.PHONY: default help install-uv clean venv build tests test-all image image-test image-push
 
 # Variables
 REGISTRY ?= docker.io
@@ -9,6 +9,12 @@ VERSION_FILE := version.py
 VERSION ?= $(shell grep '__version__' $(VERSION_FILE) | awk -F '"' '{print $$2}')
 SHA_SHORT ?= $(shell git rev-parse --short HEAD)
 APP_NAME = pygandi
+
+# Python interpreter used for venv/build/tests. Override to target a
+# specific version, e.g. `make tests PYTHON=python3.13`.
+PYTHON ?= python3
+# Supported versions for `make test-all`.
+PYTHON_VERSIONS := 3.12 3.13 3.14
 
 ##########################################################################
 ## Usage: make <command>
@@ -36,16 +42,16 @@ clean:
 	@find . -type d -name __pycache__ -exec rm -rf {} +
 	@rm -rf .venv
 
-##  - make venv : Create virtual environment
+##  - make venv : Create virtual environment (set PYTHON=pythonX.Y to pick the interpreter)
 venv:
-	@python3 -m venv .venv
+	@$(PYTHON) -m venv --clear .venv
 	@source .venv/bin/activate
 
 ##  - make build : Build the python package
 build: clean venv
 	@source .venv/bin/activate && uv pip install build && python3 -m build
 
-##  - make check : Run linting tools & tests
+##  - make tests : Run linting tools & tests (set PYTHON=pythonX.Y to pick the interpreter)
 tests: venv
 	@source .venv/bin/activate && uv pip install -e ".[test]" && \
 		black src/pygandi tests && \
@@ -53,6 +59,17 @@ tests: venv
 		pylint src/pygandi tests && \
 		mypy src/pygandi && \
 		pytest -v
+
+##  - make test-all : Run tests on every supported Python version found on PATH
+test-all:
+	@for v in $(PYTHON_VERSIONS); do \
+		if command -v python$$v >/dev/null 2>&1; then \
+			echo "=== Running tests on Python $$v ==="; \
+			$(MAKE) clean tests PYTHON=python$$v; \
+		else \
+			echo "=== Skipping Python $$v (not installed) ==="; \
+		fi; \
+	done
 
 ##  - make image : Create local docker image
 image:
