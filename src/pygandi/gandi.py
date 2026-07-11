@@ -136,15 +136,25 @@ class GandiAPI:
 
             request = self._create_record_request(record, is_new=existing_record is None)
 
-            with urllib.request.urlopen(request) as response:
-                log.debug(json.loads(response.read().decode()))
-                log.info(
-                    "Record %s for %s.%s is set to %s.",
-                    update_request.rtype,
+            try:
+                with urllib.request.urlopen(request) as response:
+                    log.debug(json.loads(response.read().decode()))
+                    log.info(
+                        "Record %s for %s.%s is set to %s.",
+                        update_request.rtype,
+                        name,
+                        update_request.fqdn,
+                        update_request.current_ip,
+                    )
+            except urllib.error.HTTPError as http_error:
+                log.error(
+                    "Failed to update record %s.%s: HTTP %s %s",
                     name,
                     update_request.fqdn,
-                    update_request.current_ip,
+                    http_error.code,
+                    http_error.reason,
                 )
+                continue
 
     def get_domain_record_by_name(self, fqdn: str, name: str, rtype: str = "A") -> Optional[dict]:
         """Get a domain record by name.
